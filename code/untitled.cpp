@@ -1,79 +1,107 @@
 #include <iostream>
+#include <vector>
+#include <string>
 
 // Define state constants
 const int STATE_IDLE    = 0;
 const int STATE_RUNNING = 1;
 const int STATE_ERROR   = 2;
 
-// Simulated inputs
-bool startButton = false;
-bool stopButton = false;
-bool jamSensor = false;
-bool jamCleared = false;
-
-// Current state variable
-int currentState = STATE_IDLE;
-
 // Define a control table entry
 struct ControlEntry {
     int fromState;
-    bool* input;          // Pointer to input condition
+    bool* input;          
     int toState;
-    const char* message;  // Message to display during transition
+    const char* message;  
 };
 
-// The control table: this is your PLC step chart in C++ form
-ControlEntry controlTable[] = {
-    {STATE_IDLE,    &startButton, STATE_RUNNING, "Starting conveyor..."},
-    {STATE_RUNNING, &stopButton,  STATE_IDLE,    "Stopping conveyor..."},
-    {STATE_RUNNING, &jamSensor,   STATE_ERROR,   "Jam detected! Going to ERROR."},
-    {STATE_ERROR,   &jamCleared,  STATE_IDLE,    "Jam cleared. Resetting to IDLE."}
-};
+// FSM class for any equipment
+class StateMachine {
+public:
+    std::string name;
+    int currentState;
+    std::vector<ControlEntry> controlTable;
 
-// Function to simulate the state update (like PLC scan)
-void updateState() {
-    for (const auto& entry : controlTable) {
-        if (entry.fromState == currentState && *(entry.input)) {
-            std::cout << entry.message << "\n";
-            currentState = entry.toState;
-            break; // Apply only the first valid transition
+    StateMachine(const std::string& deviceName, int initialState)
+        : name(deviceName), currentState(initialState) {}
+
+    void addTransition(int from, bool* input, int to, const char* message) {
+        controlTable.push_back({from, input, to, message});
+    }
+
+    void update() {
+        for (const auto& entry : controlTable) {
+            if (entry.fromState == currentState && *(entry.input)) {
+                std::cout << "[" << name << "] " << entry.message << "\n";
+                currentState = entry.toState;
+                break;
+            }
         }
     }
-}
 
-// Function to print the current state as text
-void printState() {
-    std::cout << "Current State: ";
-    if (currentState == STATE_IDLE) std::cout << "IDLE\n";
-    else if (currentState == STATE_RUNNING) std::cout << "RUNNING\n";
-    else if (currentState == STATE_ERROR) std::cout << "ERROR\n";
-}
+    void printState() const {
+        std::cout << "[" << name << "] Current State: ";
+        if (currentState == STATE_IDLE) std::cout << "IDLE\n";
+        else if (currentState == STATE_RUNNING) std::cout << "RUNNING\n";
+        else if (currentState == STATE_ERROR) std::cout << "ERROR\n";
+    }
+};
+
+// Simulated inputs
+bool startConveyor = false;
+bool stopConveyor = false;
+bool jamSensor = false;
+bool jamCleared = false;
+
+bool startPump = false;
+bool stopPump = false;
 
 int main() {
-    printState();
+    // Create FSM for Conveyor
+    StateMachine conveyor("Conveyor", STATE_IDLE);
+    conveyor.addTransition(STATE_IDLE,    &startConveyor, STATE_RUNNING, "Starting conveyor...");
+    conveyor.addTransition(STATE_RUNNING, &stopConveyor,  STATE_IDLE,    "Stopping conveyor...");
+    conveyor.addTransition(STATE_RUNNING, &jamSensor,     STATE_ERROR,   "Jam detected! Moving to ERROR.");
+    conveyor.addTransition(STATE_ERROR,   &jamCleared,    STATE_IDLE,    "Jam cleared. Returning to IDLE.");
 
-    // Simulate pressing the start button
-    startButton = true;
-    updateState();
-    printState();
-    startButton = false; // Reset button
+    // Create FSM for Pump
+    StateMachine pump("Pump", STATE_IDLE);
+    pump.addTransition(STATE_IDLE,    &startPump, STATE_RUNNING, "Pump starting...");
+    pump.addTransition(STATE_RUNNING, &stopPump,  STATE_IDLE,    "Pump stopping...");
 
-    // Simulate a jam occurring
+    // Simulate interaction
+    conveyor.printState();
+    pump.printState();
+
+    std::cout << "\n--- Activating Conveyor ---\n";
+    startConveyor = true;
+    conveyor.update();
+    conveyor.printState();
+    startConveyor = false;
+
+    std::cout << "\n--- Starting Pump ---\n";
+    startPump = true;
+    pump.update();
+    pump.printState();
+    startPump = false;
+
+    std::cout << "\n--- Conveyor Jam Detected ---\n";
     jamSensor = true;
-    updateState();
-    printState();
+    conveyor.update();
+    conveyor.printState();
     jamSensor = false;
 
-    // Simulate clearing the jam
+    std::cout << "\n--- Jam Cleared ---\n";
     jamCleared = true;
-    updateState();
-    printState();
+    conveyor.update();
+    conveyor.printState();
     jamCleared = false;
 
-    // Simulate pressing stop (but we’re already IDLE, so nothing happens)
-    stopButton = true;
-    updateState();
-    printState();
+    std::cout << "\n--- Stopping Pump ---\n";
+    stopPump = true;
+    pump.update();
+    pump.printState();
+    stopPump = false;
 
     return 0;
 }
