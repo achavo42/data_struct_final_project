@@ -1,5 +1,4 @@
 # data_struct_final_project
-# data_struct_final_project
 # Conveyor Control System Simulation (Finite State Machine)
 
 ## 📦 Project Data Structure Implemented
