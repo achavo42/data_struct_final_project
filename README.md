@@ -64,6 +64,7 @@ Allows dynamic creation and deletion of equipment
 Lists all active machines
 
 - Features:
+
  Add new equipment
 
  Prevent duplicate names
