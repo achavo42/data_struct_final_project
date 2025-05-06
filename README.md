@@ -54,6 +54,7 @@ This C++ program simulates how a **Programmable Logic Controller (PLC)** might h
 to manage multiple machines and ensure modularity:
 
 - EquipmentManager Class:
+
 Tracks all added equipment by name
 
 Prevents adding duplicates
@@ -62,7 +63,7 @@ Allows dynamic creation and deletion of equipment
 
 Lists all active machines
 
-Features:
+- Features:
  Add new equipment
 
  Prevent duplicate names
