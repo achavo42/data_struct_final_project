@@ -50,9 +50,8 @@ Provides methods to:
 
 ## Short Explanation of the Data Structure
 
-This C++ program simulates how a **Programmable Logic Controller (PLC)** might handle equipment logic using a **finite state machine**:
- - Equipment Management System
-To manage multiple machines and ensure modularity:
+This C++ program simulates how a **Programmable Logic Controller (PLC)** might handle equipment logic using a **finite state machine** Equipment Management System
+to manage multiple machines and ensure modularity:
 
 - EquipmentManager Class:
 Tracks all added equipment by name
