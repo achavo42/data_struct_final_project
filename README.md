@@ -1,45 +1,78 @@
 # data_struct_final_project
 # Modular Finite State Machine System for Equipment Control
 # Project Overview
-This project simulates a basic control system using Finite State Machines (FSMs). It models the behavior of industrial devices such as conveyors, pumps, or other equipment using simple state transitions triggered by boolean input conditions. Each device has its own state machine that can be extended or customized.
+This project simulates a modular control system for industrial equipment using Finite State Machines (FSMs). Each piece of equipment (e.g., conveyor, pump) is modeled with its own customizable state machine using a control table approach — a common structure in automation and embedded systems.
 
-This approach mirrors how Programmable Logic Controllers (PLCs) manage state transitions in automation systems—making this a great educational tool or the foundation for a more robust control system.
+It reflects how Programmable Logic Controllers (PLCs) handle state transitions triggered by inputs such as buttons or sensors, making it useful for both learning and as a foundation for more advanced control logic.
 
 ##  Project Data Structure Implemented
 
 This project implements a **Finite State Machine (FSM)** using a **control table data structure**. The FSM simulates a basic control system for process equipment with states like `IDLE`, `RUNNING`, and `ERROR`, controlled by button and sensor inputs.
 
 ### Key Components:
-- At the heart of this system is the ControlEntry struct, which models a single transition:
-fromState: The state the machine must currently be in.
+States:
 
-input: A pointer to a boolean condition (e.g., a button press).
+- IDLE, RUNNING, ERROR
 
-toState: The state to move to if the condition is true.
+- Control Table:
+A std::vector of ControlEntry structs, each defining:
 
-message: A message printed during the transition.
+ fromState: current state required
 
-- The StateMachine class encapsulates:
+input: pointer to a bool condition (e.g., button press or sensor trigger)
 
-A name (e.g., "Conveyor")
+toState: target state if the condition is true
 
-A current state
+message: status output for the transition
 
-A vector of transitions
+- StateMachine Class:
 
-An update() method that processes valid transitions
+Holds the name of the equipment
 
-A printState() method for status output
+Tracks the current state
+
+Stores transitions in a control table
+
+Provides methods to:
+
+  addTransition()
+
+  removeTransition()
+
+  modifyTransition()
+
+  update() (evaluate transitions)
+
+  printState() (display current state)
+
+
 
 
 ## Short Explanation of the Data Structure
 
 This C++ program simulates how a **Programmable Logic Controller (PLC)** might handle equipment logic using a **finite state machine**:
+ - Equipment Management System
+To manage multiple machines and ensure modularity:
 
-- **States** represent machine modes (`IDLE`, `RUNNING`, `ERROR`).
-- **Inputs** (e.g., `startButton`, `jamSensor`) represent user actions or sensor events.
-- A **control table** holds all the valid state transitions.
-- When `updateState()` is called, it loops through the table and applies the first matching transition, printing a message and changing the state.
+- EquipmentManager Class:
+Tracks all added equipment by name
+
+Prevents adding duplicates
+
+Allows dynamic creation and deletion of equipment
+
+Lists all active machines
+
+Features:
+ Add new equipment
+
+ Prevent duplicate names
+
+ Remove equipment by name
+
+ Modify or delete FSM transitions
+
+ List currently active equipment
 
 This design makes the logic easy to extend and mirrors real-world industrial control patterns.
 The code includes adding and simulating equipment. The user just needs to run the code normally.
